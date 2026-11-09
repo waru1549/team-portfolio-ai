@@ -1,0 +1,100 @@
+
+@import "tailwindcss";
+
+/* =========================================
+   TEAM PORTFOLIO AI
+   GLOBAL DESIGN SYSTEM
+========================================= */
+
+/* 1. BRAND DESIGN TOKENS */
+
+@theme {
+  /* Background */
+  --color-ink-950: #070b16;
+  --color-ink-900: #0c1220;
+
+  /* Surfaces */
+  --color-surface-900: #111827;
+  --color-surface-800: #172033;
+
+  /* Borders */
+  --color-border-subtle: #283449;
+
+  /* Brand */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+
+  /* Accent */
+  --color-accent-cyan: #67e8f9;
+
+  /* Typography */
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+
+  /* Border Radius */
+  --radius-panel: 1.5rem;
+  --radius-control: 0.75rem;
+
+  /* Shadows */
+  --shadow-glow: 0 0 40px rgb(139 92 246 / 12%);
+}
+
+/* 2. GLOBAL ROOT */
+
+:root {
+  font-family: var(--font-sans);
+  color: #f8fafc;
+  background: #070b16;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  color-scheme: dark;
+}
+
+/* 3. RESET */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #070b16;
+}
+
+/* 4. FORM ELEMENTS */
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+/* 5. ROOT CONTAINER */
+
+#root {
+  min-height: 100vh;
+}
+
+/* 6. TEXT SELECTION */
+
+::selection {
+  background: rgb(139 92 246 / 35%);
+  color: #ffffff;
+}
