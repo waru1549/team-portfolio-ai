@@ -27,6 +27,8 @@ import { MemoryRouter } from 'react-router'
 
 import ChatPage from './ChatPage'
 
+import { LanguageProvider } from '../contexts/LanguageProvider'
+
 import { sendChatMessage } from '../services/chatApi'
 
 import type { ChatApiResponse } from '../types/chat'
@@ -51,11 +53,21 @@ const mockSendChatMessage = vi.mocked(sendChatMessage)
 // TEST HELPERS
 // =========================================
 
-function renderChatPage() {
+
+type TestLanguage = 'en' | 'th'
+
+function renderChatPage(language: TestLanguage = 'en') {
+  window.localStorage.setItem(
+    'team-portfolio-ai-language',
+    language,
+  )
+
   return render(
-    <MemoryRouter>
-      <ChatPage />
-    </MemoryRouter>,
+    <LanguageProvider>
+      <MemoryRouter>
+        <ChatPage />
+      </MemoryRouter>
+    </LanguageProvider>,
   )
 }
 
@@ -113,6 +125,52 @@ afterEach(() => {
 // =========================================
 
 describe('ChatPage Component', () => {
+
+  it('should display Thai chat page content', () => {
+    renderChatPage('th')
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'ผู้ช่วย AI ประจำทีม',
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'วันนี้ให้เราช่วยอะไรได้บ้าง?',
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('button', {
+        name: 'เริ่มบทสนทนาใหม่',
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('รอการเชื่อมต่อ Backend'),
+    ).toBeInTheDocument()
+  })
+
+  it('should use Thai suggested prompts', async () => {
+    const user = userEvent.setup()
+
+    renderChatPage('th')
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'ใครเป็นสมาชิกในทีมนี้บ้าง?',
+      }),
+    )
+
+    expect(
+      screen.getByRole('textbox', {
+        name: 'พิมพ์ข้อความของคุณ',
+      }),
+    ).toHaveValue('ใครเป็นสมาชิกในทีมนี้บ้าง?')
+
+    expect(mockSendChatMessage).not.toHaveBeenCalled()
+  })
 
   // TEST 1: EMPTY STATE
 

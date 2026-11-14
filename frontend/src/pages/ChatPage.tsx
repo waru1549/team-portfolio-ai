@@ -16,7 +16,9 @@ import {
 } from 'lucide-react'
 
 import Navbar from '../components/layout/Navbar'
+import { useLanguage } from '../contexts/language-context'
 
+import type { Language } from '../data/portfolioData'
 import MessageBubble from '../components/chat/MessageBubble'
 import TypingIndicator from '../components/chat/TypingIndicator'
 import ChatComposer from '../components/chat/ChatComposer'
@@ -25,13 +27,80 @@ import { sendChatMessage, ChatApiException } from '../services/chatApi'
 
 import type { ChatMessage } from '../types/chat'
 
-const suggestedPrompts = [
-  'Who are the members of this team?',
-  'What are your team skills?',
-  'Tell me about your collaborative project.',
-]
+interface ChatPageCopy {
+  title: string
+  description: string
+  newChat: string
+  newChatAria: string
+  backendPending: string
+  conversationLabel: string
+  messagesLabel: string
+  emptyTitle: string
+  emptyDescription: string
+  tryAsking: string
+  suggestedPrompts: readonly string[]
+  errorTitle: string
+  genericError: string
+  retry: string
+  disclaimer: string
+}
+
+const chatPageCopy: Record<Language, ChatPageCopy> = {
+  en: {
+    title: 'Team AI Assistant',
+    description:
+      'Discover our team, members, skills, and projects.',
+    newChat: 'New Chat',
+    newChatAria: 'Start a new conversation',
+    backendPending: 'BACKEND PENDING',
+    conversationLabel: 'Chat conversation',
+    messagesLabel: 'Chat conversation messages',
+    emptyTitle: 'How can we help you?',
+    emptyDescription:
+      'Ask questions about our team members, technical skills, previous projects, or collaborative work.',
+    tryAsking: 'TRY ASKING',
+    suggestedPrompts: [
+      'Who are the members of this team?',
+      'What are your team skills?',
+      'Tell me about your collaborative project.',
+    ],
+    errorTitle: 'Unable to get AI response',
+    genericError: 'Something went wrong. Please try again.',
+    retry: 'Retry',
+    disclaimer:
+      'AI responses will be handled through the Team Portfolio API after backend integration.',
+  },
+
+  th: {
+    title: 'ผู้ช่วย AI ประจำทีม',
+    description:
+      'ค้นพบข้อมูลเกี่ยวกับทีม สมาชิก ทักษะ และผลงานของเรา',
+    newChat: 'แชตใหม่',
+    newChatAria: 'เริ่มบทสนทนาใหม่',
+    backendPending: 'รอการเชื่อมต่อ Backend',
+    conversationLabel: 'บทสนทนา',
+    messagesLabel: 'ข้อความในการสนทนา',
+    emptyTitle: 'วันนี้ให้เราช่วยอะไรได้บ้าง?',
+    emptyDescription:
+      'สอบถามเกี่ยวกับสมาชิกในทีม ทักษะทางเทคนิค ผลงานที่ผ่านมา หรือโปรเจกต์ที่เราทำร่วมกัน',
+    tryAsking: 'ลองถามเราได้เลย',
+    suggestedPrompts: [
+      'ใครเป็นสมาชิกในทีมนี้บ้าง?',
+      'ทีมของเรามีทักษะอะไรบ้าง?',
+      'เล่าเกี่ยวกับโปรเจกต์ที่ทีมทำร่วมกันให้ฟังหน่อย',
+    ],
+    errorTitle: 'ไม่สามารถรับคำตอบจาก AI ได้',
+    genericError: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
+    retry: 'ลองอีกครั้ง',
+    disclaimer:
+      'ระบบจะให้บริการคำตอบจาก AI ผ่าน Team Portfolio API หลังจากเชื่อมต่อ Backend แล้ว',
+  },
+}
 
 function ChatPage() {
+  const { language } = useLanguage()
+  const copy = chatPageCopy[language]
+
   // Message State
   const [messages, setMessages] = useState<ChatMessage[]>([])
 
@@ -96,8 +165,7 @@ function ChatPage() {
 
     } catch (err: unknown) {
 
-      let errorMessage =
-        'Something went wrong. Please try again.'
+      let errorMessage = copy.genericError
 
       if (err instanceof ChatApiException) {
         errorMessage = err.message
@@ -205,13 +273,13 @@ const handleNewConversation = () => {
               </div>
 
               <h1 className="font-display text-2xl font-semibold text-white">
-                Team AI Assistant
+                {copy.title}
               </h1>
 
             </div>
 
             <p className="mt-2 text-xs text-slate-400 sm:text-sm">
-              Discover our team, members, skills, and projects.
+              {copy.description}
             </p>
           </div>
 
@@ -226,11 +294,11 @@ const handleNewConversation = () => {
                 isLoading ||
                 (messages.length === 0 && conversationId === null)
               }
-              aria-label="Start a new conversation"
+              aria-label={copy.newChatAria}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Plus size={15} />
-              New Chat
+              {copy.newChat}
             </button>
 
             {/* API Integration Status Label */}
@@ -240,7 +308,7 @@ const handleNewConversation = () => {
               <span className="size-2 rounded-full bg-brand-400" />
 
               <span className="text-[10px] font-semibold tracking-wide text-amber-300">
-                BACKEND PENDING
+                {copy.backendPending}
               </span>
 
             </div>
@@ -252,7 +320,7 @@ const handleNewConversation = () => {
         {/* Chat Container */}
 
         <section
-          aria-label="Chat conversation"
+          aria-label={copy.conversationLabel}
           className="flex min-h-140 flex-1 flex-col overflow-hidden rounded-panel border border-border-subtle bg-surface-900 shadow-glow"
         >
 
@@ -260,7 +328,7 @@ const handleNewConversation = () => {
 
           <div
             role="log"
-            aria-label="Chat conversation messages"
+            aria-label={copy.messagesLabel}
             aria-live="polite"
             aria-relevant="additions"
             aria-atomic="false"
@@ -281,27 +349,25 @@ const handleNewConversation = () => {
                 </div>
 
                 <h2 className="mt-6 font-display text-2xl font-semibold text-white">
-                  How can we help you?
+                  {copy.emptyTitle}
                 </h2>
 
                 <p className="mt-3 max-w-md text-sm leading-7 text-slate-400">
-                  Ask questions about our team members,
-                  technical skills, previous projects,
-                  or collaborative work.
+                  {copy.emptyDescription}
                 </p>
 
                 {/* Suggested Questions */}
 
                 <div className="mt-8 w-full max-w-lg">
 
-                  <div className="mb-3 flex items-center justify-center gap-2 text-xs text-slate-500">
+                  <div className="mb-3 flex items-center justify-center gap-2 text-xs text-slate-400">
                     <Users size={14} />
-                    TRY ASKING
+                    {copy.tryAsking}
                   </div>
 
                   <div className="flex flex-wrap justify-center gap-2">
 
-                    {suggestedPrompts.map((prompt) => (
+                    {copy.suggestedPrompts.map((prompt) => (
 
                       <button
                         key={prompt}
@@ -352,7 +418,7 @@ const handleNewConversation = () => {
                       <div className="min-w-0 flex-1">
 
                         <p className="text-sm font-semibold text-red-300">
-                          Unable to get AI response
+                          {copy.errorTitle}
                         </p>
 
                         <p className="mt-1 wrap-break-word text-xs leading-6 text-slate-400">
@@ -367,7 +433,7 @@ const handleNewConversation = () => {
                             className="mt-3 inline-flex items-center gap-2 rounded-lg bg-red-400/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-400/20 disabled:opacity-50"
                           >
                             <RefreshCw size={13} />
-                            Retry
+                            {copy.retry}
                           </button>
                         )}
 
@@ -402,8 +468,8 @@ const handleNewConversation = () => {
 
         {/* Footer Disclaimer */}
 
-        <p className="mt-4 text-center text-[10px] leading-5 text-slate-600">
-          AI responses are generated through the Team Portfolio API.
+        <p className="mt-4 text-center text-[10px] leading-5 text-slate-400">
+          {copy.disclaimer}
         </p>
 
       </main>
